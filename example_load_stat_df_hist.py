@@ -14,6 +14,7 @@ if __name__ == '__main__':
 
     # Использование переменных
     mask_dir = config["MASK_DIR"]
+    num_processes = int(config["NUM_PROC"])
 
     class_colors = class_colors_stpls3d
     # 1. Загрузка масок
@@ -21,7 +22,10 @@ if __name__ == '__main__':
     # 2. Расчёт распределения классов
     num_classes = len(class_colors)  # Указываем количество классов на основе длины словаря
     start = time.time()
-    df = calculate_class_distribution_stat_file_parallel(masks_dict, class_colors, num_processes=7, output_csv='stat_mask.csv')
+    df = calculate_class_distribution_stat_file_parallel(masks_dict,
+                                                         class_colors,
+                                                         num_processes=num_processes,
+                                                         output_csv='stat_mask.csv')
     end = time.time()
     time_processing = end - start
     print(f'Time processing {round(time_processing)}s')
