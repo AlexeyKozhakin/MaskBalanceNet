@@ -1,10 +1,16 @@
 # Byte-compiled / optimized / DLL files
+output/*.png
+output/*.csv
+*.csv
+*.png
+config.json
 .idea
 output_balanced_dataset/
 __pycache__/
 *.py[cod]
 *$py.class
-
+venv
+venv_mask_balance_net
 # C extensions
 *.so
 

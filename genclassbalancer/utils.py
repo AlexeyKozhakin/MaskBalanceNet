@@ -1,7 +1,100 @@
 # utils.py
-import numpy as np
+from multiprocessing import Pool, cpu_count
 import pandas as pd
+import numpy as np
 
+
+
+def process_mask(args):
+    """
+    Функция для обработки одной маски. Вызывается в параллельных процессах.
+
+    Parameters:
+    args (tuple): Кортеж из имени файла, маски и цветов классов.
+
+    Returns:
+    list: Статистика для одного файла в формате [имя файла, кол-во пикселей для каждого класса].
+    """
+    filename, mask, class_colors = args
+    num_classes = len(class_colors)
+    class_counts = np.zeros(num_classes, dtype=int)
+
+    # Считаем количество пикселей для каждого класса
+    c_id = 0
+    for class_id, color in class_colors.items():
+        class_counts[c_id] += np.sum(np.all(mask == color, axis=-1))
+        c_id += 1
+
+    return [filename] + class_counts.tolist()
+
+
+def calculate_class_distribution_stat_file_parallel(masks_dict, class_colors, num_processes=1, output_csv='stat_mask.csv'):
+    """
+    Параллельное вычисление распределения классов по маскам и сохранение статистики в CSV файл.
+
+    Parameters:
+    masks_dict (dict): Словарь, где ключ - название файла, значение - маска в виде numpy массива
+    class_colors (dict): Словарь цветов классов {класс: (R, G, B)}
+    output_csv (str): Путь к выходному CSV-файлу, по умолчанию 'stat_mask.csv'
+
+    Returns:
+    pd.DataFrame: DataFrame с распределением классов для каждой маски
+    """
+    # Подготовка данных для параллельной обработки
+    tasks = [(filename, mask, class_colors) for filename, mask in masks_dict.items()]
+
+
+    # Параллельная обработка масок
+    with Pool(processes=num_processes) as pool:
+        results = pool.map(process_mask, tasks)
+
+    # Создаем DataFrame
+    num_classes = len(class_colors)
+    columns = ['filename'] + [f'class_{i}' for i in range(num_classes)]
+    df = pd.DataFrame(results, columns=columns)
+
+    # Сохраняем DataFrame в CSV
+    df.to_csv(output_csv, index=False)
+    print(f"Статистика сохранена в файл: {output_csv}")
+
+    return df
+
+def calculate_class_distribution_stat_file(masks_dict, class_colors, output_csv='stat_mask.csv'):
+    """
+    Считает распределение классов по маскам и сохраняет статистику в CSV файл.
+
+    Parameters:
+    masks_dict (dict): Словарь, где ключ - название файла, значение - маска в виде numpy массива
+    class_colors (dict): Словарь цветов классов {класс: (R, G, B)}
+    output_csv (str): Путь к выходному CSV-файлу, по умолчанию 'stat_mask.csv'
+
+    Returns:
+    pd.DataFrame: DataFrame с распределением классов для каждой маски
+    """
+    num_classes = len(class_colors)
+    stats = []
+
+    for filename, mask in masks_dict.items():
+        class_counts = np.zeros(num_classes, dtype=int)
+
+        # Считаем количество пикселей для каждого класса
+        c_id = 0
+        for class_id, color in class_colors.items():
+            class_counts[c_id] += np.sum(np.all(mask == color, axis=-1))
+            c_id+=1
+
+        # Сохраняем статистику в формате: [имя файла, кол-во пикселей для каждого класса]
+        stats.append([filename] + class_counts.tolist())
+
+    # Создаем DataFrame
+    columns = ['filename'] + [f'class_{i}' for i in range(num_classes)]
+    df = pd.DataFrame(stats, columns=columns)
+
+    # Сохраняем DataFrame в CSV
+    df.to_csv(output_csv, index=False)
+    print(f"Статистика сохранена в файл: {output_csv}")
+
+    return df
 
 def calculate_class_distribution(masks_dict, class_colors, output_csv_path):
     """

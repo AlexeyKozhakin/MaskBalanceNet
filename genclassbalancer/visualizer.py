@@ -18,6 +18,8 @@ def plot_class_distribution(distribution, output_path=None):
     plt.xlabel('Class')
     plt.ylabel('Pixel Count')
     plt.title('Class Distribution')
+    # Добавляем метки на оси X
+    plt.xticks(ticks=classes, labels=[f'{ind}' for ind, cls in enumerate(classes)])
 
     if output_path:
         # Проверка, существует ли директория, и создание её, если нет

@@ -3,6 +3,26 @@ import os
 import numpy as np
 from PIL import Image
 
+
+def load_masks_dict(mask_dir):
+    """
+    Загружает маски из директории и возвращает словарь с названиями файлов и масками.
+
+    Parameters:
+    mask_dir (str): Путь к директории с масками
+
+    Returns:
+    dict: Словарь, где ключ - это название файла, а значение - маска в виде numpy массива
+    """
+    masks_dict = {}
+    for filename in os.listdir(mask_dir):
+        if filename.endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp')):
+            mask_path = os.path.join(mask_dir, filename)
+            mask = Image.open(mask_path)
+            masks_dict[filename] = np.array(mask)
+
+    return masks_dict
+
 def load_masks(mask_dir):
     """
     Загружает маски из директории.
