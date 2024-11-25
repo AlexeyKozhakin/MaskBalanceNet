@@ -4,6 +4,7 @@ output/*.csv
 *.csv
 *.png
 config.json
+config_balance.json
 .idea
 output_balanced_dataset/
 __pycache__/
