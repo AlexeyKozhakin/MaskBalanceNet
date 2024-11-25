@@ -1,0 +1,12 @@
+{
+  "input_folder": "D:\\data\\data_for_training\\data_training_stpl3d_256_512\\train_org",
+  "output_folder": "D:\\data\\data_for_training\\data_training_stpl3d_256_512\\train_augm_check",
+  "num_workers": 7,
+  "augmentation_targets": {
+    "20_points_GTv3_-256_0.png": 32,
+    "11_points_GTv3_-256_-256.png": 7,
+    "USC_points_-256_-512.png": 16,
+    "20_points_GTv3_0_0.png": 42,
+    "Henderson_0_-256.png": 3
+  }
+}
